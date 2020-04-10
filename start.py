@@ -1,10 +1,12 @@
 import requests
-from urllib import quote
+from urllib.parse import quote
 import base64
 import re
 import time
+import os
 
-cookies = '_fofapro_ars_session=xxxxxxxxxxxxxx;'
+fofa_session = os.environ.get('fofa_session')
+cookies = '_fofapro_ars_session={};'.format(fofa_session)
 
 def main(params):
     with open('list.txt', 'w+') as f:
@@ -14,20 +16,25 @@ def main(params):
                 f.flush()
     f.close()
 
-def getData(page, q):
-    print '[START] Page '+str(page)
+def getData(page, search):
+    print('[START] Page '+str(page))
     time.sleep(2.5)
-    qbase64 = quote(base64.b64encode(q).encode('utf-8'))
-    data = requests.get('https://fofa.so/result?page='+str(page)+"&q="+q+'&qbase64='+qbase64, headers = {'Cookie':cookies}).text
+    url = 'https://fofa.so/result?page={}&q={}&qbase64={}'.format(str(page), quote(search), quote(base64.b64encode(search.encode('utf-8'))))
+    data = requests.get(url, headers = {"Cookie": cookies}).text
     if 'Retry later' in data:
-        print '[!!+!!!]'+str(page)+'[!!!!!]'
+        print('[!!+!!!]'+str(page)+'[!!!!!]')
         time.sleep(20)
-        return getData(page, q)
+        return getData(page, search)
     r = re.compile(r'"javascript:view\(\'(.*)\'\)')
     ret = r.findall(data)
-    print ret
-    print '[END] Page ' + str(page)
+    print(ret)
+    print('[END] Page ' + str(page))
     return ret
 
 if __name__ == '__main__':
-    main('app="Solr"')
+    if fofa_session == None:
+        print("Session not set")
+        exit(0)
+    print(cookies)
+    search = input('Search command: (app="Solr")'+"\n")
+    main(search)
