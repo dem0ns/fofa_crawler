@@ -1,10 +1,10 @@
-# Fofa Crawler
+# FOFA爬虫 穷人版
 
 ### Dependence
 - pip3 install -r requirements.txt
 
-### Set Environment
-- set fofa_session=xxxxxx
+### Set env variable
+- fofa_session=xxxxxx
 
 ### Run
 - python3 main.py
