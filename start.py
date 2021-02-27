@@ -18,14 +18,14 @@ def main(params):
 
 def getData(page, search):
     print('[START] Page '+str(page))
-    time.sleep(2.5)
+    time.sleep(2)
     url = 'https://fofa.so/result?page={}&q={}&qbase64={}'.format(str(page), quote(search), quote(base64.b64encode(search.encode('utf-8'))))
-    data = requests.get(url, headers = {"Cookie": cookies}).text
-    if 'Retry later' in data:
+    data = requests.get(url, headers = {"Cookie": cookies, "X-Requested-With": "XMLHttpRequest", "Accept": "*/*;q=0.5, text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"}).text
+    if 'Retry Later. ' in data:
         print('[!!+!!!]'+str(page)+'[!!!!!]')
         time.sleep(20)
         return getData(page, search)
-    r = re.compile(r'"javascript:view\(\'(.*)\'\)')
+    r = re.compile(r'<a target=\\\"_blank\\\" href=\\\"(\S*)\\\">')
     ret = r.findall(data)
     print(ret)
     print('[END] Page ' + str(page))
